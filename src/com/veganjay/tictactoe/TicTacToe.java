@@ -48,20 +48,10 @@ public class TicTacToe {
 		return col;
 	}
 	
-	private void test1() {
-//		board.addPiece(2, Piece.X);
-//		board.addPiece(5, Piece.O);
-//		board.addPiece(1, Piece.X);
-//		board.addPiece(3, Piece.O);
-//		board.addPiece(6, Piece.X);
-//		board.addPiece(9, Piece.O);
-	}
 	public void mainLoop() {
 		// Initialize with start player
 		currentPlayer = START_PLAYER;
 		TicTacToeAI ai = new TicTacToeAI(Piece.O);
-
-		test1();
 		
 		// Display the board;
 		board.printBoard();

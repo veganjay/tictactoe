@@ -10,12 +10,13 @@ public class TicTacToeAI {
 	// Constants
 	public static final int MINMAX_DEPTH = 9;
 	
+	// Debug variable
+	private boolean debugEnabled = false;
+	
 	// Member variables
 	private TicTacToeBoard board;
 	private Piece computerPiece;
 	private Piece playerPiece;
-	
-	private Node childWithMax;
 
 	// Inner class
 	private class Node {
@@ -24,12 +25,9 @@ public class TicTacToeAI {
 		private int   row;
 		private int   column;
 		
-		private Set<Node> children;
-		
 		public Node(TicTacToeBoard board, Piece currentPlayer) {
 			this.board    = new TicTacToeBoard(board);
 			this.currentPlayer = currentPlayer;
-			//this.children = this.createChildren();
 		}
 		
 		public Node(TicTacToeBoard board, Piece currentPlayer, int row, int column) {
@@ -38,12 +36,10 @@ public class TicTacToeAI {
 			this.column = column;
 		}
 
-//		public Set<Node> getChildren() {
-//			return children;
-//		}
 		public void debug() {
 			this.board.printBoard();
 		}
+		
 		public boolean isTerminalNode() {
 			boolean terminal = false;
 			
@@ -80,7 +76,7 @@ public class TicTacToeAI {
 					TicTacToeBoard childBoard = new TicTacToeBoard(board);
 					childBoard.addPiece(i, j, currentPlayer);
 
-					//System.out.println("Creating child with space " + i + ", " + j);
+					//debug("Creating child with space " + i + ", " + j);
 					
 					// Store the child in the tree
 					Node child = new Node(childBoard, getNextPlayer(), i, j);
@@ -127,31 +123,39 @@ public class TicTacToeAI {
 			this.playerPiece = Piece.X;
 		}
 	}
+
+	public void enableDebug() {
+		this.debugEnabled = true;
+	}
+	
+	public void disableDebug() {
+		this.debugEnabled = false;
+	}
+	
+	private void debug(String s) {
+		if (this.debugEnabled) {
+			System.out.println(s);
+		}
+	}
 	
 	private int minimax(Node node, int depth, int alpha, int beta, boolean needMax) {
 		if (depth <= 0 || node.isTerminalNode()) {
-//			node.debug();
-//			System.out.println(node.getObjectiveValue());
 			return node.getObjectiveValue();
 		}
 
 		for (Node child : node.getChildren()) {
 			int score = minimax(child, depth-1, alpha, beta, !needMax);
 
-			if (needMax) {
+			if (needMax) {  // Do Max
 				if (score > alpha) {
 					alpha = score;
-					childWithMax = child;
-					//childWithMax.debug();
 				}
 				if (beta <= alpha) {
 					break;
 				}
-			} else {
+			} else { // Do Min
 				if (score < beta) {
 					beta = score;
-					childWithMax = child;
-					//childWithMax.debug();
 				}
 				if (beta <= alpha) {
 					break;
@@ -161,78 +165,6 @@ public class TicTacToeAI {
 		
 		return needMax ? alpha : beta;
 	}
-
-	// OLD Code - long version from:
-	// http://www.codeproject.com/Articles/43622/Solve-Tic-Tac-Toe-with-the-MiniMax-algorithm
-	/*
-	private int minimax(Node node, boolean needMax, int alpha, int beta, int depth) {
-		// Check for end case
-		if (depth <= 0 || node.isTerminalNode()) {
-			return node.getObjectiveValue();
-		}
-
-		// Look at children nodes recursively
-		for (Node child : node.getChildren()) {
-			int score = minimax(child, !needMax, alpha, beta, depth-1);
-			
-	        if (!needMax)
-	        {
-	            if (beta > score)
-	            {
-	                beta = score;
-	                childWithMax = child;
-	                if (alpha >= beta)
-	                {
-	                    break;
-	                }
-	            }
-	        }
-	        else
-	        {
-	            if (alpha < score)
-	            {
-	                alpha = score;
-	                childWithMax = child;
-	                if (alpha >= beta)
-	                {
-	                    break;
-	                }
-	            }
-	        }
-			
-	    }		
-		return needMax ? alpha : beta;
-	}
-	*/
-
-	// OLD
-	/*
-	private int minimax(Node node, int alpha, int beta, int depth) {
-		if (node.getBoard().isFull() || depth <= 0) {
-			int objValue = 0;
-			if (node.getBoard().isWinner(computerPiece)) {
-				objValue = 1;
-			} else if (node.getBoard().isWinner(playerPiece)) {
-				objValue = -1;
-			}
-			System.out.println("objValue=" + objValue);
-			return objValue;
-		}
-
-		for (Node child : node.getChildren()) {
-			int score = -minimax(child, -beta, -alpha, depth-1);
-	        if (alpha < score) {
-	            alpha = score;
-	            childWithMax = child;
-	            System.out.println("childWithMax=" + childWithMax + ", alpha=" + alpha + ", beta=" + beta);
-	            if (alpha >= beta) {
-	                break;
-	            }
-	        }
-	    }		
-		return alpha;
-	}
-	*/
 		
 	public int getMove(TicTacToeBoard other) {
 		int spaceNum = 0;
@@ -248,7 +180,7 @@ public class TicTacToeAI {
 			score = this.minimax(child, MINMAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, false);
 			
 			// Display the move and score, for debugging
-			System.out.println(child.getSpaceNum() + ", score=" + score);
+			debug(child.getSpaceNum() + ", score=" + score);
 			
 			// Chose the best move
 			if (score > bestScore) {
@@ -257,32 +189,14 @@ public class TicTacToeAI {
 			}
 		}
 
-		System.out.println("bestMove " + bestMove + ", bestScore = " + bestScore);
+		debug("bestMove " + bestMove + ", bestScore = " + bestScore);
 		if (bestMove != null) {
 			spaceNum = bestMove.getSpaceNum();
 		}
 		return spaceNum;
 	}
 
-	public int getMoveOld(TicTacToeBoard other) {
-		int spaceNum = 0;
-				
-		Node node = new Node(other, computerPiece);
-		childWithMax = null;
-		int maxValue = Integer.MIN_VALUE;
-		
-		// Use Minimax to get computer move
-		maxValue = this.minimax(node, MINMAX_DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
-
-		System.out.println("New version: ChildWithMax: " + childWithMax + " = " + maxValue);
-		if (childWithMax != null) {
-//			childWithMax.debug();
-			spaceNum = childWithMax.getSpaceNum();
-		}
-		return spaceNum;
-	}
-
-	
+	@Deprecated
 	public int getComputerMove(TicTacToeBoard other) {
 		int spaceNum    = 0;
 		int maxObjValue = Integer.MIN_VALUE;
@@ -302,7 +216,7 @@ public class TicTacToeAI {
 				int objValue = this.getObjectiveValue(board);
 				int space = TicTacToeBoard.getPlaceNum(i, j);
 				
-				// System.out.println(space + " " + objValue);
+				// debug(space + " " + objValue);
 				if (objValue > maxObjValue) {
 					maxObjValue = objValue;
 					spaceNum = space;
@@ -311,7 +225,7 @@ public class TicTacToeAI {
 			}
 		}
 		
-		System.out.println("objValue = " + maxObjValue);
+		debug("objValue = " + maxObjValue);
 		
 		return spaceNum;
 	}

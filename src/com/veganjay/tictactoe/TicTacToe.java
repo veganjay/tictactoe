@@ -9,6 +9,12 @@ import com.veganjay.tictactoe.TicTacToeBoard.Piece;
  * 
  * Computer AI using MiniMax with beta-alpha pruning and depth specification
  * @author jason
+ * 
+ * TODO
+ * - Choose Start Player
+ * - Play again
+ * - Clean up code
+ * - Graphical version
  */
 public class TicTacToe {
 	public static final Piece START_PLAYER = Piece.X;

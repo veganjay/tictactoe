@@ -88,6 +88,18 @@ public class TicTacToeBoard {
 	 * @param p a piece: X or O
 	 * @return true if successful, false if already occupied
 	 */
+	public boolean isOccupied(int spaceNum) {
+		Position pos = new Position(spaceNum);
+		
+		return isOccupied(pos.getRow(), pos.getCol());
+	}
+	
+	/**
+	 * 
+	 * @param spaceNum 1-9
+	 * @param p a piece: X or O
+	 * @return true if successful, false if already occupied
+	 */
 	public boolean addPiece(int spaceNum, Piece p) {
 		Position pos = new Position(spaceNum);
 		

@@ -16,6 +16,7 @@ import com.veganjay.tictactoe.TicTacToeBoard.Piece;
  * - Clean up code - main loop
  * - Set better objective value in AI
  * - Graphical version
+ * - Error checking
  */
 public class TicTacToe {
 	public static final Piece START_PLAYER = Piece.X;
@@ -118,8 +119,10 @@ public class TicTacToe {
 			int spaceNum;
 			if (currentPlayer == human) {
 				// Get the choice
-				System.out.print("Enter Space Number (1-9): ");
-				spaceNum = getChoice();							
+				do {
+					System.out.print("Enter Space Number (1-9): ");
+					spaceNum = getChoice();
+				} while (board.isOccupied(spaceNum));
 			} else {
 				spaceNum = ai.getMove(board); 
 				System.out.println("Computer moves to " + spaceNum);
